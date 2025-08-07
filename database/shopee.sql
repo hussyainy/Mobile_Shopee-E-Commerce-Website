@@ -81,13 +81,20 @@ CREATE TABLE `user` (
   `register_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `user`
+-- Add username and password columns for login
+ALTER TABLE `user`
+  ADD COLUMN `username` VARCHAR(100) NOT NULL AFTER `last_name`,
+  ADD COLUMN `password` VARCHAR(255) NOT NULL AFTER `username`;
+
 --
 
 INSERT INTO `user` (`user_id`, `first_name`, `last_name`, `register_date`) VALUES
 (1, 'Daily', 'Tuition', '2020-03-28 13:07:17'),
 (2, 'Akshay', 'Kashyap', '2020-03-28 13:07:17');
+
+-- Update demo users with username and password (passwords are md5 hashed)
+UPDATE `user` SET `username` = 'daily', `password` = MD5('password1') WHERE `user_id` = 1;
+UPDATE `user` SET `username` = 'akshay', `password` = MD5('password2') WHERE `user_id` = 2;
 
 -- --------------------------------------------------------
 

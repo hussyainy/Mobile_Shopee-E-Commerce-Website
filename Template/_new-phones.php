@@ -44,6 +44,20 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
                                 }
                                 ?>
                             </form>
+                            <form method="post">
+                                <input type="hidden" name="item_id" value="<?php echo $item['item_id'] ?? '1'; ?>">
+                                <input type="hidden" name="user_id" value="<?php echo isset($_SESSION['username']) ? $_SESSION['user_id'] : 0; ?>">
+                                <?php
+                                $wishlist_ids = $Cart->getCartId($product->getData('wishlist')) ?? [];
+                                if (!isset($_SESSION['username'])) {
+                                    echo '<button type="button" class="btn btn-outline-danger font-size-12" disabled title="Login to add to wishlist">Add to Wishlist</button>';
+                                } elseif (in_array($item['item_id'], $wishlist_ids)) {
+                                    echo '<button type="button" class="btn btn-danger font-size-12" disabled>In Wishlist</button>';
+                                } else {
+                                    echo '<button type="submit" name="wishlist_submit" class="btn btn-outline-danger font-size-12">Add to Wishlist</button>';
+                                }
+                                ?>
+                            </form>
                         </div>
                     </div>
                 </div>

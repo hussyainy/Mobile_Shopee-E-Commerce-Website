@@ -34,3 +34,7 @@ class DBController
         }
     }
 }
+
+// Legacy support: expose $conn for old code
+$db = new DBController();
+$conn = $db->con;

@@ -11,6 +11,10 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
         // call method addToCart
         $Cart->addToCart($_POST['user_id'], $_POST['item_id']);
     }
+    if (isset($_POST['wishlist_submit'])) {
+        // call method addToWishlist (assumes Cart has addToWishlist or similar)
+        $Cart->addToWishlist($_POST['user_id'], $_POST['item_id']);
+    }
 }
 
 $in_cart = $Cart->getCartId($product->getData('cart'));
@@ -30,6 +34,9 @@ $in_cart = $Cart->getCartId($product->getData('cart'));
 
         <div class="grid">
             <?php array_map(function ($item) use($in_cart){ ?>
+            <?php
+            global $Cart, $product;
+            ?>
             <div class="grid-item border <?php echo $item['item_brand'] ?? "Brand" ; ?>">
                 <div class="item py-2" style="width: 200px;">
                     <div class="product font-rale">
@@ -54,6 +61,20 @@ $in_cart = $Cart->getCartId($product->getData('cart'));
                                     echo '<button type="submit" disabled class="btn btn-success font-size-12">In the Cart</button>';
                                 }else{
                                     echo '<button type="submit" name="top_sale_submit" class="btn btn-warning font-size-12">Add to Cart</button>';
+                                }
+                                ?>
+                            </form>
+                            <form method="post">
+                                <input type="hidden" name="item_id" value="<?php echo $item['item_id'] ?? '1'; ?>">
+                                <input type="hidden" name="user_id" value="<?php echo isset($_SESSION['username']) ? $_SESSION['user_id'] : 0; ?>">
+                                <?php
+                                $wishlist_ids = $Cart->getCartId($product->getData('wishlist')) ?? [];
+                                if (!isset($_SESSION['username'])) {
+                                    echo '<button type="button" class="btn btn-outline-danger font-size-12" disabled title="Login to add to wishlist">Add to Wishlist</button>';
+                                } elseif (in_array($item['item_id'], $wishlist_ids)) {
+                                    echo '<button type="button" class="btn btn-danger font-size-12" disabled>In Wishlist</button>';
+                                } else {
+                                    echo '<button type="submit" name="wishlist_submit" class="btn btn-outline-danger font-size-12">Add to Wishlist</button>';
                                 }
                                 ?>
                             </form>

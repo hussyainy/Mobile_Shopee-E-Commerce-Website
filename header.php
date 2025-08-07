@@ -31,8 +31,39 @@
     <div class="strip d-flex justify-content-between px-4 py-1 bg-light">
         <p class="font-rale font-size-12 text-black-50 m-0">Jordan Calderon 430-985 Eleifend St. Duluth Washington 92611 (427) 930-5255</p>
         <div class="font-rale font-size-14">
-            <a href="#" class="px-3 border-right border-left text-dark">Login</a>
-            <a href="#" class="px-3 border-right text-dark">Whishlist (0)</a>
+            <?php session_start(); ?>
+            <?php
+            $wishlistCount = 0;
+            if (isset($_SESSION["user_id"]) && isset($conn) && $conn instanceof mysqli) {
+                try {
+                    $user_id = $_SESSION["user_id"];
+                    $result = @$conn->query("SELECT COUNT(*) as cnt FROM wishlist WHERE user_id = $user_id");
+                    if ($result) {
+                        $row = $result->fetch_assoc();
+                        $wishlistCount = $row['cnt'];
+                    }
+                } catch (Throwable $e) {
+                    // Connection is closed or error occurred, keep wishlistCount as 0
+                }
+            }
+            ?>
+            <?php if (isset($_SESSION["username"])): ?>
+                <span class="px-3 border-right border-left text-dark">Hello, <?= htmlspecialchars($_SESSION["username"]) ?></span>
+                <a href="profile.php" class="px-3 border-right text-dark">Profile</a>
+                <a href="logout.php" class="px-3 border-right text-dark">Logout</a>
+            <?php else: ?>
+                <a href="login.php" class="px-3 border-right border-left text-dark">Login</a>
+                <a href="register.php" class="px-3 border-right text-dark">Register</a>
+            <?php endif; ?>
+            <?php if (isset($_SESSION["user_id"])): ?>
+                <a href="cart.php#wishlist" class="px-3 border-right text-dark" title="View your wishlist">
+                    <i class="fas fa-heart text-danger"></i> Wishlist (<?= $wishlistCount ?>)
+                </a>
+            <?php else: ?>
+                <a href="login.php" class="px-3 border-right text-dark" title="Login to use wishlist">
+                    <i class="far fa-heart"></i> Wishlist (0)
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 

@@ -7,8 +7,22 @@ class Cart
 
     public function __construct(DBController $db)
     {
-        if (!isset($db->con)) return null;
+        if (!isset($db->con)) {
+            return;
+        }
         $this->db = $db;
+    }
+
+    // Add item to wishlist
+    public function addToWishlist($userid, $itemid){
+        if (isset($userid) && isset($itemid)){
+            // Do not specify cart_id, let MySQL auto-increment
+            $query_string = sprintf("INSERT INTO wishlist(user_id, item_id) VALUES (%d, %d)", $userid, $itemid);
+            $result = $this->db->con->query($query_string);
+            if ($result){
+                header("Location: " . $_SERVER['PHP_SELF']);
+            }
+        }
     }
 
     // insert into cart table
@@ -83,16 +97,18 @@ class Cart
     // Save for later
     public function saveForLater($item_id = null, $saveTable = "wishlist", $fromTable = "cart"){
         if ($item_id != null){
-            $query = "INSERT INTO {$saveTable} SELECT * FROM {$fromTable} WHERE item_id={$item_id};";
-            $query .= "DELETE FROM {$fromTable} WHERE item_id={$item_id};";
-
-            // execute multiple query
-            $result = $this->db->con->multi_query($query);
-
-            if($result){
-                header("Location :" . $_SERVER['PHP_SELF']);
+            // Insert into wishlist from cart
+            $insert_query = "INSERT INTO {$saveTable} (user_id, item_id) SELECT user_id, item_id FROM {$fromTable} WHERE item_id={$item_id}";
+            $delete_query = "DELETE FROM {$fromTable} WHERE item_id={$item_id}";
+            $insert_result = $this->db->con->query($insert_query);
+            if ($insert_result) {
+                $delete_result = $this->db->con->query($delete_query);
+                if ($delete_result) {
+                    header("Location: " . $_SERVER['PHP_SELF']);
+                }
+                return $delete_result;
             }
-            return $result;
+            return $insert_result;
         }
     }
 
